@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -225,7 +226,7 @@
                 buildTop5();
                 applyFilters('全部'); 
 
-                // Hash 路由檢查
+                // ======= 終極路由功能：使用 Hash (#id=) 完美支援本機與伺服器 =======
                 const hash = window.location.hash;
                 if (hash && hash.startsWith('#id=')) {
                     const urlId = hash.replace('#id=', '');
@@ -390,16 +391,19 @@
             if(!text) return '';
             const str = String(text).trim();
             if(str.startsWith('<')) return str;
-            return str.split(/
-?
-/).map(line => line.trim() ? `<p class="mb-6">${line}</p>` : '').join('');
+            
+            // 自動偵測試算表中的換行，轉換為帶有美麗間距的段落
+            return str.split(/\r?\n/).map(line => line.trim() ? `<p class="mb-6">${line}</p>` : '').join('');
         }
 
         function openDetail(item, pushState = true) {
+            // ======= 終極路由邏輯：使用 Hash =======
             if (pushState) {
                 try {
+                    // 使用 #id=X 而不是 ?id=X，這樣本機檔案也能無痛修改網址！
                     window.history.pushState(null, '', '#id=' + item.id);
                 } catch(e) { 
+                    // 如果還是被擋，直接用最底層的 hash 賦值
                     window.location.hash = 'id=' + item.id;
                 }
             }
@@ -414,46 +418,38 @@
             
             let htmlParts = [];
             
-            // 主圖 (大圖) -> 靠左排版 (text-left)
             if(item.image_url) {
                 htmlParts.push(`
                     <div class="mb-10 group">
                         <div class="overflow-hidden rounded-xl border border-white/10">
                             <img src="${item.image_url}" class="w-full h-[300px] md:h-[500px] object-cover transition-transform duration-700 group-hover:scale-105">
                         </div>
-                        ${item.image_source ? `<p class="text-left text-[11px] text-[var(--neon-lime)] mt-3 font-bold tracking-widest uppercase">${item.image_source}</p>` : ''}
+                        ${item.image_source ? `<p class="text-right text-[11px] text-[var(--neon-lime)] mt-3 font-bold tracking-widest uppercase">${item.image_source}</p>` : ''}
                     </div>
                 `);
             }
-            
             if(item.content_1) htmlParts.push(`<div class="article-content mb-12 text-gray-300 leading-relaxed text-lg">${formatContent(item.content_1)}</div>`);
-            
-            // 內容圖 1 -> 靠左排版 (text-left)
             if(item.content_img1_url) {
                 htmlParts.push(`
                     <div class="mb-10 group relative md:px-10">
                         <div class="overflow-hidden rounded-xl border border-white/10 shadow-lg">
                             <img src="${item.content_img1_url}" class="w-full h-[250px] md:h-[400px] object-cover transition-transform duration-700 group-hover:scale-105">
                         </div>
-                        ${item.content_img1_source ? `<p class="text-left text-[11px] text-[var(--neon-lime)] mt-3 font-bold tracking-widest uppercase md:ml-10">${item.content_img1_source}</p>` : ''}
+                        ${item.content_img1_source ? `<p class="text-right text-[11px] text-[var(--neon-lime)] mt-3 font-bold tracking-widest uppercase">${item.content_img1_source}</p>` : ''}
                     </div>
                 `);
             }
-            
             if(item.content_2) htmlParts.push(`<div class="article-content mb-12 text-gray-300 leading-relaxed text-lg">${formatContent(item.content_2)}</div>`);
-            
-            // 內容圖 2 -> 靠左排版 (text-left)
             if(item.content_img2_url) {
                 htmlParts.push(`
                     <div class="mb-10 group relative md:px-10">
                         <div class="overflow-hidden rounded-xl border border-white/10 shadow-lg">
                             <img src="${item.content_img2_url}" class="w-full h-[250px] md:h-[400px] object-cover transition-transform duration-700 group-hover:scale-105">
                         </div>
-                        ${item.content_img2_source ? `<p class="text-left text-[11px] text-[var(--neon-lime)] mt-3 font-bold tracking-widest uppercase md:ml-10">${item.content_img2_source}</p>` : ''}
+                        ${item.content_img2_source ? `<p class="text-right text-[11px] text-[var(--neon-lime)] mt-3 font-bold tracking-widest uppercase">${item.content_img2_source}</p>` : ''}
                     </div>
                 `);
             }
-            
             if(item.content_3) htmlParts.push(`<div class="article-content mb-12 text-gray-300 leading-relaxed text-lg">${formatContent(item.content_3)}</div>`);
             
             document.getElementById('detail-main-body').innerHTML = htmlParts.join('');
@@ -485,8 +481,10 @@
         function goHome(pushState = true) {
             if (pushState) {
                 try {
+                    // 回首頁時清空 hash
                     window.history.pushState(null, '', window.location.pathname + window.location.search);
                 } catch(e) {
+                    // 備案
                     history.replaceState(null, null, ' ');
                 }
             }
@@ -495,6 +493,7 @@
             window.scrollTo({ top: scrollPosBeforeDetail, behavior: 'auto' });
         }
 
+        // 監聽上一頁功能 (監聽 Hash 改變)
         window.addEventListener('popstate', () => {
             const hash = window.location.hash;
             if (hash && hash.startsWith('#id=')) {
