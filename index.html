@@ -280,7 +280,7 @@
             });
             
             wrap.innerHTML = `
-                <div class="relative w-full h-[450px] rounded-xl overflow-hidden glass-card group cursor-pointer shadow-2xl">
+                <div class="relative w-full aspect-[4/3] md:h-[450px] md:aspect-auto rounded-xl overflow-hidden glass-card group cursor-pointer shadow-2xl">
                     ${slidesHTML}
                     <button class="nav-btn left-4" onclick="event.stopPropagation(); prevSlide()"><iconify-icon icon="lucide:chevron-left"></iconify-icon></button>
                     <button class="nav-btn right-4" onclick="event.stopPropagation(); nextSlide()"><iconify-icon icon="lucide:chevron-right"></iconify-icon></button>
@@ -357,12 +357,11 @@
             const nextBatch = gridData.slice(currentIndex, currentIndex + 9);
             nextBatch.forEach(item => {
                 const card = document.createElement('div');
-                // 這裡加入了完美相容手機 2:1 橫式與桌機原樣的響應式 class
-                card.className = `glass-card relative group reveal aspect-[2/1] md:h-[360px] md:aspect-auto rounded-xl cursor-pointer`;
+                card.className = `glass-card relative group reveal aspect-[4/3] md:h-[360px] md:aspect-auto rounded-xl cursor-pointer`;
                 const displayDate = item.date ? String(item.date).substring(0, 10) : '';
                 card.innerHTML = `
                     <img src="${item.image_url || 'https://picsum.photos/800/500'}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent p-4 md:p-8 flex flex-col justify-end z-10">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent p-5 md:p-8 flex flex-col justify-end z-10">
                         <span class="text-[var(--neon-lime)] font-black text-[10px] tracking-widest mb-1 uppercase">${item.category || '未分類'}</span>
                         <h4 class="font-black text-base md:text-xl group-hover:text-[var(--neon-lime)] transition-colors line-clamp-2">${item.title}</h4>
                         <div class="mt-2 md:mt-4 pt-2 md:pt-4 border-t border-white/10 flex justify-between items-center text-[10px] opacity-40 font-bold">
